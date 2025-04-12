@@ -1,0 +1,22 @@
+﻿{
+  "Board": {
+    "Words": [
+      "дягиль",
+      "абажур",
+      "ловель",
+      "логово"
+    ]
+  },
+  "Clusters": [
+    { "Letters": "дя" },
+    { "Letters": "гиль" },
+    { "Letters": "аба" },
+    { "Letters": "жур" },
+    { "Letters": "лов" },
+    { "Letters": "е" },
+    { "Letters": "ль" },
+    { "Letters": "л" },
+    { "Letters": "ог" },
+    { "Letters": "ово" }
+  ]
+}
