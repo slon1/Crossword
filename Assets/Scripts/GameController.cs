@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -10,28 +12,48 @@ public class GameController : MonoBehaviour {
 	private GridView gridView;
 	private BankView bankView;
 	private ClusterView.Factory clusterViewFactory;
+	private LevelService levelService;
 	private List<ClusterView> clusters;
 	private ClusterPositionManager positionManager;
 	[SerializeField]
-	private Canvas canvas;
+	private Transform root;
 	[SerializeField] private Button validateButton;
 
 	[Inject]
-	public void Construct(GridView gridView, BankView bankView, ClusterView.Factory clusterViewFactory) {
+	public void Construct(GridView gridView, BankView bankView, ClusterView.Factory clusterViewFactory, LevelService levelService) {
 		this.gridView = gridView;
 		this.bankView = bankView;
-		this.clusterViewFactory = clusterViewFactory;
+		this.clusterViewFactory = clusterViewFactory;		
+		this.levelService = levelService;
 	}
 
-	private void Start() {
-		string json = "{\"Board\":{\"Words\":[\"дягиль\",\"абажур\",\"ловель\",\"логово\"]},\"Clusters\":[{\"Letters\":\"дя\"},{\"Letters\":\"гиль\"},{\"Letters\":\"аба\"},{\"Letters\":\"жур\"},{\"Letters\":\"лов\"},{\"Letters\":\"е\"},{\"Letters\":\"ль\"},{\"Letters\":\"л\"},{\"Letters\":\"ог\"},{\"Letters\":\"ово\"}]}";
-		levelData = new LevelData(json);
+	private async void Start() {
+		await LoadCurrentLevel();
+	}
+
+	private async UniTask LoadCurrentLevel() {
+		try {
+			int currentLevel = levelService.GetCurrentLevel();
+			LevelData loadedLevelData = await levelService.LoadLevel(currentLevel);
+			if (loadedLevelData == null) {
+				Debug.LogError("Failed to load level data!");
+				return;
+			}
+
+			OnLevelLoaded(loadedLevelData);
+		}
+		catch (Exception e) {
+			Debug.LogError($"Failed to load level: {e.Message}");
+		}
+	}
+
+	private void OnLevelLoaded(LevelData loadedLevelData) {
+		levelData = loadedLevelData;
 		model = new Model(4, 6);
 		gridView.Initialize(4, 6);
 
 		positionManager = new ClusterPositionManager(model, gridView);
 
-		
 		clusters = new List<ClusterView>();
 		foreach (var clusterLetters in levelData.Clusters) {
 			var cluster = clusterViewFactory.Create();
@@ -52,9 +74,31 @@ public class GameController : MonoBehaviour {
 		}
 	}
 
+	private void Reset() {
+		// Очищаем старые кластеры
+		if (clusters != null) {
+			foreach (var cluster in clusters) {
+				cluster.OnDragBegin -= OnClusterDragBegin;
+				cluster.OnDragEnd -= OnClusterDragEnd;
+				Destroy(cluster.gameObject);
+			}
+			clusters.Clear();
+		}
+
+		// Очищаем модель и сетку
+		model = null;
+		gridView.Clear();
+
+		// Очищаем банк
+		bankView.Clear();
+
+		// Очищаем позиционный менеджер
+		positionManager = null;
+	}
+
 	private void OnClusterDragBegin(ClusterView cluster) {
 		positionManager.ClearPosition(cluster);
-		cluster.transform.SetParent(canvas.transform, true);
+		cluster.transform.SetParent(root, true);
 	}
 
 	private void OnClusterDragEnd(ClusterView cluster) {
@@ -88,11 +132,14 @@ public class GameController : MonoBehaviour {
 		return !cells.Any(cell => model.IsOccupied(cell));
 	}
 
-	public void Validate() {
+	public async void Validate() {
 		string[] words = model.GetWords();
 		bool win = words.Length == levelData.ExpectedWords.Count && words.All(w => levelData.ExpectedWords.Contains(w));
 		if (win) {
 			Debug.Log("Победа!");
+			levelService.CompleteLevel();
+			Reset(); // Очищаем состояние перед загрузкой нового уровня
+			await LoadCurrentLevel(); // Загружаем следующий уровень
 		}
 		else {
 			List<string> expectedWords = new List<string>(levelData.ExpectedWords);

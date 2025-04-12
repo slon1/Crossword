@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 public class BankView : MonoBehaviour {
 	[SerializeField] private RectTransform content;
@@ -11,9 +11,9 @@ public class BankView : MonoBehaviour {
 	}
 
 	public void SetClusters(List<ClusterView> clusters) {
-		
+
 		clusters.Shuffle();
-				
+
 		foreach (var cluster in clusters) {
 			cluster.transform.SetParent(content, false);
 			clustersInBank.Add(cluster);
@@ -44,7 +44,7 @@ public class BankView : MonoBehaviour {
 
 	private void ResetContentPosition() {
 		content.anchoredPosition = new Vector2(content.anchoredPosition.x, 0);
-		
+
 		// ScrollRect scrollRect = GetComponentInParent<ScrollRect>();
 		// if (scrollRect != null)
 		// {
@@ -52,7 +52,14 @@ public class BankView : MonoBehaviour {
 		// }
 	}
 
-	
+
+	public void Clear() {
+		clustersInBank.Clear();
+		foreach (Transform child in content) {
+			Destroy(child.gameObject);
+		}
+
+	}
 }
 public static class ListExtensions {
 	public static void Shuffle<T>(this IList<T> list) {

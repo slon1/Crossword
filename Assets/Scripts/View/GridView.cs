@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 using Zenject;
 
 public class GridView : MonoBehaviour {
@@ -39,7 +39,7 @@ public class GridView : MonoBehaviour {
 	public List<Vector2Int> GetCellsUnderCluster(ClusterView cluster) {
 		List<Vector2Int> cellIndices = new List<Vector2Int>();
 
-		
+
 		Vector2 firstCellPos = cluster.Cells[0].GetPosition();
 		Vector2 localPos;
 		RectTransformUtility.ScreenPointToLocalPointInRectangle(gridRectTransform, firstCellPos, null, out localPos);
@@ -80,4 +80,19 @@ public class GridView : MonoBehaviour {
 		center /= cellIndices.Count;
 		return center;
 	}
+
+
+	public void Clear() {
+		if (cells != null) {
+			for (int row = 0; row < cells.GetLength(0); row++) {
+				for (int col = 0; col < cells.GetLength(1); col++) {
+					if (cells[row, col] != null) {
+						Destroy(cells[row, col].gameObject);
+					}
+				}
+			}
+			cells = null;
+		}
+	}
+
 }

@@ -1,0 +1,23 @@
+﻿{
+  "Board": {
+    "Words": [
+      "баклан",
+      "ячмень",
+      "чипсет",
+      "фундук"
+    ]
+  },
+  "Clusters": [
+    { "Letters": "б" },
+    { "Letters": "акл" },
+    { "Letters": "ан" },
+    { "Letters": "ячм" },
+    { "Letters": "ень" },
+    { "Letters": "чи" },
+    { "Letters": "псе" },
+    { "Letters": "т" },
+    { "Letters": "ф" },
+    { "Letters": "унд" },
+    { "Letters": "ук" }
+  ]
+}
