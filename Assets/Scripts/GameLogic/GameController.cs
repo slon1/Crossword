@@ -5,29 +5,46 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
-
+using GameLogic;
 public class GameController : MonoBehaviour {
 	private LevelData levelData;
 	private Model model;
 	private GridView gridView;
 	private BankView bankView;
 	private ClusterView.Factory clusterViewFactory;
-	private LevelService levelService;
+	private ILevelService levelService;
 	private List<ClusterView> clusters;
 	private ClusterPositionManager positionManager;
+	private IGUIManager guiManager;
+
 	[SerializeField]
 	private Transform root;
 	[SerializeField] private Button validateButton;
 
 	[Inject]
-	public void Construct(GridView gridView, BankView bankView, ClusterView.Factory clusterViewFactory, LevelService levelService) {
+	public void Construct(GridView gridView, BankView bankView, ClusterView.Factory clusterViewFactory, ILevelService levelService, IGUIManager guiManager) {
 		this.gridView = gridView;
 		this.bankView = bankView;
 		this.clusterViewFactory = clusterViewFactory;		
 		this.levelService = levelService;
+		this.guiManager = guiManager;
 	}
 
 	private async void Start() {
+		await levelService.Initialize();
+		EventBus.Bus.AddListener(EventId.Game, StartGame);
+		EventBus.Bus.AddListener<ClusterView>(EventId.ClusterDragBegin, OnClusterDragBegin);
+		EventBus.Bus.AddListener<ClusterView>(EventId.ClusterDragEnd, OnClusterDragEnd);
+		if (validateButton != null) {
+			validateButton.onClick.AddListener(Validate);
+		}
+		else {
+			Debug.LogError("ValidateButton is not assigned in the Inspector!");
+		}
+	}
+
+	private async void StartGame() {
+		
 		await LoadCurrentLevel();
 	}
 
@@ -48,6 +65,7 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void OnLevelLoaded(LevelData loadedLevelData) {
+		
 		levelData = loadedLevelData;
 		model = new Model(4, 6);
 		gridView.Initialize(4, 6);
@@ -57,42 +75,26 @@ public class GameController : MonoBehaviour {
 		clusters = new List<ClusterView>();
 		foreach (var clusterLetters in levelData.Clusters) {
 			var cluster = clusterViewFactory.Create();
-			cluster.Initialize(clusterLetters, 100);
-			cluster.OnDragBegin += OnClusterDragBegin;
-			cluster.OnDragEnd += OnClusterDragEnd;
+			cluster.Initialize(clusterLetters, 100);			
 			clusters.Add(cluster);
 			positionManager.InitializeCluster(cluster);
 		}
 
 		bankView.SetClusters(clusters);
 
-		if (validateButton != null) {
-			validateButton.onClick.AddListener(Validate);
-		}
-		else {
-			Debug.LogError("ValidateButton is not assigned in the Inspector!");
-		}
+		
 	}
 
-	private void Reset() {
-		// Очищаем старые кластеры
+	private void Reset() {		
 		if (clusters != null) {
-			foreach (var cluster in clusters) {
-				cluster.OnDragBegin -= OnClusterDragBegin;
-				cluster.OnDragEnd -= OnClusterDragEnd;
+			foreach (var cluster in clusters) {				
 				Destroy(cluster.gameObject);
 			}
 			clusters.Clear();
-		}
-
-		// Очищаем модель и сетку
+		}		
 		model = null;
-		gridView.Clear();
-
-		// Очищаем банк
-		bankView.Clear();
-
-		// Очищаем позиционный менеджер
+		gridView.Clear();	
+		bankView.Clear();		
 		positionManager = null;
 	}
 
@@ -132,14 +134,17 @@ public class GameController : MonoBehaviour {
 		return !cells.Any(cell => model.IsOccupied(cell));
 	}
 
-	public async void Validate() {
+	public void Validate() {
 		string[] words = model.GetWords();
 		bool win = words.Length == levelData.ExpectedWords.Count && words.All(w => levelData.ExpectedWords.Contains(w));
 		if (win) {
+		
 			Debug.Log("Победа!");
 			levelService.CompleteLevel();
 			Reset(); // Очищаем состояние перед загрузкой нового уровня
-			await LoadCurrentLevel(); // Загружаем следующий уровень
+			guiManager.ShowPanel( PanelId.Win);
+			guiManager.Execute<string[]>(PanelId.Win, PageActionId.Win, words);
+			//await LoadCurrentLevel(); // Загружаем следующий уровень
 		}
 		else {
 			List<string> expectedWords = new List<string>(levelData.ExpectedWords);
@@ -154,5 +159,11 @@ public class GameController : MonoBehaviour {
 			resultMessage += "Осталось: " + (expectedWords.Count > 0 ? string.Join(", ", expectedWords) : "ничего");
 			Debug.Log(resultMessage);
 		}
+	}
+	private void OnDestroy() {
+		EventBus.Bus.RemoveListener(EventId.Game, StartGame);
+		EventBus.Bus.RemoveListener<ClusterView>(EventId.ClusterDragBegin, OnClusterDragBegin);
+		EventBus.Bus.RemoveListener<ClusterView>(EventId.ClusterDragEnd, OnClusterDragEnd);
+
 	}
 }

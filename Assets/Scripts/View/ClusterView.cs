@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -47,9 +48,17 @@ public class ClusterView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 
 	public Vector2 GetPosition() {
 		return rectTransform.position;
+
 	}
 
 	public void SetPosition(Vector2 position) {
+		rectTransform.localScale = Vector3.one; 
+		rectTransform.DOScale(1.2f, 0.1f) 
+			.SetEase(Ease.OutQuad) 
+			.OnComplete(() => {
+				rectTransform.DOScale(1f, 0.1f) 
+					.SetEase(Ease.InQuad); 
+			});
 		rectTransform.position = position;
 	}
 
@@ -57,17 +66,21 @@ public class ClusterView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 		canvasGroup.blocksRaycasts = false;
 		initialMousePosition = eventData.position;
 		initialClusterPosition = rectTransform.position;
-		OnDragBegin?.Invoke(this);
+		EventBus.Bus.Invoke(EventId.ClusterDragBegin, this);
+
 	}
 
 	public void OnDrag(PointerEventData eventData) {
 		Vector2 mouseDelta = eventData.position - initialMousePosition;
 		rectTransform.position = initialClusterPosition + mouseDelta;
+		
+		
 	}
 
 	public void OnEndDrag(PointerEventData eventData) {
 		canvasGroup.blocksRaycasts = true;
-		OnDragEnd?.Invoke(this);
+		EventBus.Bus.Invoke(EventId.ClusterDragEnd, this);
+
 	}
 
 	public class Factory : PlaceholderFactory<ClusterView> { }
