@@ -11,13 +11,11 @@ namespace GameLogic {
 		private const int MAX_LEVELS = 4;
 		private int currentLevel;
 
-		public LevelService() {
-			// Переносим логику из Awake
+		public LevelService() {			
 			currentLevel = PlayerPrefs.GetInt(CURRENT_LEVEL_KEY, 1);
 		}
 
-		public async UniTask Initialize() {
-			// Переносим логику из Start
+		public async UniTask Initialize() {			
 			await UnityServices.InitializeAsync();
 			if (!AuthenticationService.Instance.IsSignedIn) {
 				await AuthenticationService.Instance.SignInAnonymouslyAsync();

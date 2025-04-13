@@ -144,10 +144,10 @@ namespace GameLogic {
 
 				Debug.Log("Победа!");
 				levelService.CompleteLevel();
-				Reset(); // Очищаем состояние перед загрузкой нового уровня
+				Reset(); 
 				guiManager.ShowPanel(PanelId.Win);
 				guiManager.Execute<string[]>(PanelId.Win, PageActionId.Win, words);
-				//await LoadCurrentLevel(); // Загружаем следующий уровень
+				//await LoadCurrentLevel(); 
 			}
 			else {
 				List<string> expectedWords = new List<string>(levelData.ExpectedWords);
