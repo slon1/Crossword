@@ -123,6 +123,7 @@ public class GameController : MonoBehaviour {
 				ReturnClusterToBank(cluster);
 			}
 		}
+		EventBus.Bus.Invoke(EventId.OnClick);
 	}
 
 	private void ReturnClusterToBank(ClusterView cluster) {

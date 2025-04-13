@@ -12,11 +12,7 @@ public class ClusterView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 	private Cell.Factory cellFactory;
 	private Transform border;
 	private Vector2 initialMousePosition;
-	private Vector2 initialClusterPosition;
-
-	public delegate void DragHandler(ClusterView cluster);
-	public event DragHandler OnDragBegin;
-	public event DragHandler OnDragEnd;
+	private Vector2 initialClusterPosition;	
 
 	public string Letters => letters;
 	public List<Cell> Cells => cells;

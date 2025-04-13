@@ -2,7 +2,11 @@ public enum EventId {
 	Menu,
 	Game,
 	ClusterDragBegin,
-	ClusterDragEnd
+	ClusterDragEnd,
+	OnClick,
+	Sound
+	
+
 }
 public enum PanelId {
 	Game,

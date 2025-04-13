@@ -11,11 +11,13 @@ public class SettingsScr : ScrAbs {
 		if (action == PageActionId.SoundOn) {
 			GetButton(ButtonId.SoundOff).gameObject.SetActive(false);
 			GetButton(ButtonId.SoundOn).gameObject.SetActive(true);
+			EventBus.Bus.Invoke(EventId.Sound,true);
 			
 		}
 		if (action == PageActionId.SoundOff) {
 			GetButton(ButtonId.SoundOff).gameObject.SetActive(true);
-			GetButton(ButtonId.SoundOn).gameObject.SetActive(false);			
+			GetButton(ButtonId.SoundOn).gameObject.SetActive(false);
+			EventBus.Bus.Invoke(EventId.Sound,false);
 		}
 	}
 }
