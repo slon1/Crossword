@@ -1,0 +1,22 @@
+﻿{
+  "Board": {
+    "Words": [
+      "долото",
+      "злодей",
+      "лебедь",
+      "мякина"
+    ]
+  },
+  "Clusters": [
+    { "Letters": "доло" },
+    { "Letters": "то" },
+    { "Letters": "зло" },    
+    { "Letters": "дей" },
+    { "Letters": "ле" },
+    { "Letters": "бе" },
+    { "Letters": "дь" },
+    { "Letters": "м" },
+    { "Letters": "як" },
+    { "Letters": "ина" }
+  ]
+}

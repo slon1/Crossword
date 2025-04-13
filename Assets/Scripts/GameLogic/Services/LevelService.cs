@@ -8,12 +8,12 @@ namespace GameLogic {
 	public class LevelService : ILevelService {
 		private const string CURRENT_LEVEL_KEY = "CurrentLevel";
 		private const string DEFAULT_LEVEL_PATH = "Levels/default_level";
-		private const int MAX_LEVELS = 3;
+		private const int MAX_LEVELS = 4;
 		private int currentLevel;
 
 		public LevelService() {
 			// Переносим логику из Awake
-			currentLevel = 1;// PlayerPrefs.GetInt(CURRENT_LEVEL_KEY, 1);
+			currentLevel = PlayerPrefs.GetInt(CURRENT_LEVEL_KEY, 1);
 		}
 
 		public async UniTask Initialize() {
@@ -42,8 +42,8 @@ namespace GameLogic {
 					RemoteConfigService.Instance.FetchCompleted -= OnFetch;
 					if (configResponse.requestOrigin == ConfigOrigin.Remote) {
 						string levelKey = $"Level{currentLevel}";
-						//string jsonData = RemoteConfigService.Instance.appConfig.GetJson(levelKey);
-						string jsonData = RemoteConfigService.Instance.appConfig.GetJson("TestLevelData");
+						string jsonData = RemoteConfigService.Instance.appConfig.GetJson(levelKey);
+						//string jsonData = RemoteConfigService.Instance.appConfig.GetJson("TestLevelData");
 						
 						if (string.IsNullOrEmpty(jsonData)) {
 							Debug.LogError($"Failed to load level data for {levelKey}");
@@ -69,8 +69,7 @@ namespace GameLogic {
 
 		public void CompleteLevel() {
 			currentLevel++;
-			if (currentLevel > MAX_LEVELS) {
-				Debug.Log("Достигнут последний уровень. Возвращаемся на первый уровень.");
+			if (currentLevel > MAX_LEVELS) {				
 				currentLevel = 1;
 			}
 			PlayerPrefs.SetInt(CURRENT_LEVEL_KEY, currentLevel);

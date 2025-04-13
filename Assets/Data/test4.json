@@ -1,0 +1,23 @@
+﻿{
+  "Board": {
+    "Words": [
+      "тополь",
+      "фабула",
+      "чудеса",
+      "восход"
+    ]
+  },
+  "Clusters": [
+    { "Letters": "топ" },
+    { "Letters": "о" },
+    { "Letters": "ль" },
+    { "Letters": "фаб" },
+    { "Letters": "у" },
+    { "Letters": "ла" },
+    { "Letters": "чу" },
+    { "Letters": "деса" },
+    { "Letters": "во" },
+    { "Letters": "с" },
+    { "Letters": "ход" }
+  ]
+}

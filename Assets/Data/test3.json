@@ -1,0 +1,22 @@
+﻿{
+  "Board": {
+    "Words": [
+      "мясник",
+      "сказка",
+      "реванш",
+      "скорбь"
+    ]
+  },
+  "Clusters": [
+    { "Letters": "мя" },
+    { "Letters": "сн" },
+    { "Letters": "ик" },
+    { "Letters": "ска" },
+    { "Letters": "зка" },    
+    { "Letters": "рева" },
+    { "Letters": "нш" },
+    { "Letters": "ско" },
+    { "Letters": "р" },
+    { "Letters": "бь" }
+  ]
+}
