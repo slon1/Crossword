@@ -1,4 +1,5 @@
 using GameLogic;
+using GameUI;
 using Zenject;
 
 public class GameInstaller : MonoInstaller {

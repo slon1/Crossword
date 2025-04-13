@@ -14,8 +14,8 @@ public class SoundManager : MonoBehaviour
 		EventBus.Bus.AddListener<bool>(EventId.Sound, MuteSound);
 	}
 
-	private void MuteSound(bool mute) {
-		audioSource.mute = mute;
+	private void MuteSound(bool unmute) {
+		audioSource.mute = !unmute;
 	}
 
 	private void PlaySound() {
